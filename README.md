@@ -47,6 +47,7 @@ INSTALLATION & USE
    analysis
 
 EXAMPLE:
+
      % in the MarkovZoomingMap folder
      % load the provided example graph (a ring of rings) into an adjacency matrix
      A = convertPajekToAdjMatrix('ring_of_rings.net');
