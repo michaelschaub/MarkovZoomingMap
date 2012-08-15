@@ -80,7 +80,7 @@ written to disk, and subseqently read from the C code. This I/O is essentially
 not necessary. Instead on could pass the network data straight to the C 
 implementation via e.g. a mex file from Matlab (However if you are interested 
 in the "intermediate" graphs you may not want to do this, and instead change 
-script as to not delete the temporary files but keep them).
+the script as to not delete the temporary files but keep them).
 
 2) The stationary distribution of the graph is in this code computed by a
 "matrix power method". Since the actual code as it stands deals with undirected
