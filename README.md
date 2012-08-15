@@ -40,26 +40,26 @@ Please cite the above mentioned articles if you make use of this code.
 -----------------------------------------------------------------------------
 INSTALLATION & USE
 -----------------------------------------------------------------------------
-1) Download the files and unzip the folders it neccessary
-2) in a terminal, go into the infomap_dir folder and run "make" to compile 
+1. Download the files and unzip the folders it neccessary
+2. in a terminal, go into the infomap_dir folder and run "make" to compile 
    the C code.
-3) In Matlab you can now use the function "MarkovZoomingMap" to run your 
+3. In Matlab you can now use the function "MarkovZoomingMap" to run your 
    analysis
 
 EXAMPLE:
-	% in the MarkovZoomingMap folder
-	% load the provided example graph (a ring of rings) into an adjacency matrix
-	A = convertPajekToAdjMatrix('ring_of_rings.net');
-	
-	% assign an output filename
-	filename = 'test';
+     % in the MarkovZoomingMap folder
+     % load the provided example graph (a ring of rings) into an adjacency matrix
+     A = convertPajekToAdjMatrix('ring_of_rings.net');
+     
+     % assign an output filename
+     filename = 'test';
 
-	% specify a time interval for the analysis
-	time =logspace(-1,2,100);
+     % specify a time interval for the analysis
+     time =logspace(-1,2,100);
 
-	% run the actual analysis; note that the time argument is optional, if not
-	% provided the time interval is set to the one also used in this example
-	MarkovZoomingMap(A,filename,time)
+     % run the actual analysis; note that the time argument is optional, if not
+     % provided the time interval is set to the one also used in this example
+     MarkovZoomingMap(A,filename,time)
 
 This should create a folder named "{filename}ZoomingMap" containing the results
 of the analysis in a file named Map_clustering.mat, plus a (directed) pajek .net
