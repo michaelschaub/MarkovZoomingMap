@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Markovzoomingmap by michaelschaub</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Markovzoomingmap</h1>
+        <p></p>
+
+        <p class="view"><a href="https://github.com/michaelschaub/MarkovZoomingMap">View the Project on GitHub <small>michaelschaub/MarkovZoomingMap</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/michaelschaub/MarkovZoomingMap/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/michaelschaub/MarkovZoomingMap/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/michaelschaub/MarkovZoomingMap">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p>Copyright (C) 2012, M. Schaub, M. Barahona</p>
+
+<p>This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+
+<p>This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU General Public License
+along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+
+<hr><h2>Community Detection using Markov Zooming Infomap</h2>
+
+<p>This code implements a MATLAB/C++ version of the Markov Zooming Map equation 
+method as discussed in the article:</p>
+
+<p>"Encoding dynamics for multiscale community detection: Markov time sweeping for 
+the Map equation", M.T.Schaub, R. Lambiotte, M. Barahona, Physical Review E, 
+to appear; see also arXiv:1109.6642</p>
+
+<p>The code is based on the implementation of the original Map equation method
+which can be found under <a href="http://www.tp.umu.se/%7Erosvall/code.html">http://www.tp.umu.se/~rosvall/code.html</a>
+The original Map equation method is described in the following publication:</p>
+
+<p>"Maps of information flow reveal community structure in complex networks"
+Martin Rosvall and Carl T. Bergstrom, PNAS 105, 1118 (2008); 
+see also arXiv:0707.0609</p>
+
+<p>Please cite the above mentioned articles if you make use of this code.</p>
+
+<hr><h2>INSTALLATION &amp; USE</h2>
+
+<ol>
+<li>Download the files and unzip the folders it neccessary</li>
+<li>in a terminal, go into the infomap_dir folder and run "make" to compile 
+the C code.</li>
+<li>In Matlab you can now use the function "MarkovZoomingMap" to run your 
+analysis</li>
+</ol><p>EXAMPLE:</p>
+
+<pre><code> % in the MarkovZoomingMap folder
+ % load the provided example graph (a ring of rings) into an adjacency matrix
+ A = convertPajekToAdjMatrix('ring_of_rings.net');
+
+ % assign an output filename
+ filename = 'test';
+
+ % specify a time interval for the analysis
+ time =logspace(-1,2,100);
+
+ % run the actual analysis; note that the time argument is optional, if not
+ % provided the time interval is set to the one also used in this example
+ MarkovZoomingMap(A,filename,time)
+</code></pre>
+
+<p>This should create a folder named "{filename}ZoomingMap" containing the results
+of the analysis in a file named Map_clustering.mat, plus a (directed) pajek .net
+file of the original graph.</p>
+
+<p>To plot the results of the analysis you may want to load the .mat file and use 
+the provided matlab script "script_plot_Map_results.m".</p>
+
+<hr><h2>Some potential code changes / improvements</h2>
+
+<p>This released code has not been thoroughly optimized for speed, however there
+are two obvious ways to speed up the performance.</p>
+
+<p>1) At the moment for each timepoint, a temporary pajek file is created and 
+written to disk, and subseqently read from the C code. This I/O is essentially
+not necessary. Instead on could pass the network data straight to the C 
+implementation via e.g. a mex file from Matlab (However if you are interested 
+in the "intermediate" graphs you may not want to do this, and instead change 
+script as to not delete the temporary files but keep them).</p>
+
+<p>2) The stationary distribution of the graph is in this code computed by a
+"matrix power method". Since the actual code as it stands deals with undirected
+graphs, this is however not necessary. Instead one can easily compute the 
+stationary distribution analytically. However to make the code more easily 
+adaptable to the directed case, this computationally more expensive variant has 
+been left in  the C code.</p>
+
+<p>Further you may want to stop all the output from being displayed while the 
+optimization is running, this is also easily achievable by changing the C code
+accordingly.</p>
+
+<hr><p>Author   : M. Schaub</p>
+
+<h2>Email    : <a href="mailto:michael.schaub09@imperial.ac.uk">michael.schaub09@imperial.ac.uk</a> </h2>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/michaelschaub">michaelschaub</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
