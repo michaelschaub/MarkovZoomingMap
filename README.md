@@ -27,9 +27,11 @@ method as discussed in the article:
 the Map equation", M.T.Schaub, R. Lambiotte, M. Barahona, Physical Review E, 
 to appear; see also arXiv:1109.6642
 
-The code is based on the implementation of the original Map equation method
+The code is based on the implementation of the original map equation method
 which can be found under http://www.tp.umu.se/~rosvall/code.html
-The original Map equation method is described in the following publication:
+See also http://www.mapequation.org for a dynamic visualisation of the map 
+equation. The original Map equation method is described in the following 
+publication:
 
 "Maps of information flow reveal community structure in complex networks"
 Martin Rosvall and Carl T. Bergstrom, PNAS 105, 1118 (2008); 
@@ -48,8 +50,8 @@ INSTALLATION & USE
 
 EXAMPLE:
 
-     % in the MarkovZoomingMap folder
-     % load the provided example graph (a ring of rings) into an adjacency matrix
+     % in the MarkovZoomingMap folder, load the provided example graph 
+     % (a ring of rings) into an adjacency matrix
      A = convertPajekToAdjMatrix('ring_of_rings.net');
      
      % assign an output filename
