@@ -97,6 +97,6 @@ accordingly.
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-Author   : M. Schaub
+Author   : M. Schaub  
 Email    : michael.schaub09@imperial.ac.uk 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
