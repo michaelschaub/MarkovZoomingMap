@@ -24,8 +24,8 @@ This code implements a MATLAB/C++ version of the Markov Zooming Map equation
 method as discussed in the article:
 
 "Encoding dynamics for multiscale community detection: Markov time sweeping for 
-the Map equation", M.T.Schaub, R. Lambiotte, M. Barahona, Physical Review E, 
-to appear; see also arXiv:1109.6642
+the Map equation", M.T.Schaub, R. Lambiotte, M. Barahona, Phys. Rev. E, 2012, 
+86(2), 026112; see also arXiv:1109.6642
 
 The code is based on the implementation of the original map equation method
 which can be found under http://www.tp.umu.se/~rosvall/code.html
@@ -96,7 +96,7 @@ optimization is running, this is also easily achievable by changing the C code
 accordingly.
 
 
------------------------------------------------------------------------------
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 Author   : M. Schaub
 Email    : michael.schaub09@imperial.ac.uk 
------------------------------------------------------------------------------
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
