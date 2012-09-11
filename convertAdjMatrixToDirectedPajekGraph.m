@@ -30,7 +30,7 @@ fprintf(fid,'*Arcs\n');
 psize = length(link);
 for z= 1:psize
             % looping in column first order lower triangular hence swapping indices!
-            fprintf(fid,'%i %i %e \n', j(z), i(z), link(z));          
+            fprintf(fid,'%i %i %e \n', i(z), j(z), link(z));          
 
 end
 fclose('all');
