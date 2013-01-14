@@ -43,7 +43,7 @@ end
 new_name = [filename 'ZoomingMap'];
 mkdir(new_name);
 
-h_exp = 1:length(time);
+h_exp = zeros(1,length(time));
 L_exp = h_exp;
 clustering_new = zeros(length(A),length(time));
 i=1;
