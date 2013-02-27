@@ -1,12 +1,15 @@
-% (c) 2012 M Schaub -- michael.schaub09@imperial.ac.uk
+% (c) 2012-2013 M Schaub -- michael.schaub09@imperial.ac.uk
 function A= convertPajekToAdjMatrix(filename)
-% Convert undirected pajek graph into sparse adjacency matrix. Assumes node
-% numbering in pajek file starts with 0 or 1.
+% Convert undirected, weigthed pajek graph into sparse adjacency matrix. 
+% Assumes node numbering in pajek file starts with 0 or 1, 
+% and is contiguous.
+%
 % Inputs:
 %
-%           filename:   string with filename of output file,
-%                       e.g. 'pajekgraph.net'. If file already exists
-%                       contents are overwritten
+%           filename:   string with filename of input file,
+%                       e.g. 'pajekgraph.net'. Links in the Pajek file should have a weight, i.e. should be in a format
+%                       [from] [to] [weight]
+%                       
 % Outputs:
 %           A:          Adjacency matrix of undirected graph in sparse data
 %                       format

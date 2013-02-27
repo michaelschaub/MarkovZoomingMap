@@ -6,9 +6,10 @@ function A= convertUnweightedPajekToAdjMatrix(filename)
 %
 % Inputs:
 %
-%           filename:   string with filename of output file,
-%                       e.g. 'pajekgraph.net'. If file already exists
-%                       contents are overwritten
+%           filename:   string with filename of input file,
+%                       e.g. 'pajekgraph.net'. Links in the Pajek file should have no weight, i.e. should be in a format
+%                       [from] [to]
+%                       
 % Outputs:
 %           A:          Adjacency matrix of undirected graph in sparse data
 %                       format
