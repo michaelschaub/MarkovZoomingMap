@@ -13,8 +13,8 @@ Greedy::Greedy(MTRand *RR,int nnode,Node **ah,int nmember){
   node = ah;
   Nmod = Nnode;
   
-  alpha = 0.0; //********** 0.15// teleportation probability
-  beta = 1.0;//-alpha; *******// probability to take normal step
+  alpha = 0;//0.15; // teleportation probability
+  beta = 1.0;//-alpha; // probability to take normal step
   
   Ndanglings = 0;
   
@@ -226,6 +226,13 @@ void Greedy::move(bool &moved){
 }
 
 void Greedy::initiate(void){
+ 
+  //   if(Ndanglings > 0){
+  //     cout << "Found " << Ndanglings << " dangling node(s)." << endl;
+  //   }
+  
+  // Calculate steady state matrix
+  eigenvector();
   
   // Take care of dangling nodes, normalize outLinks, and calculate total teleport weight
   for(int i=0;i<Nnode;i++){
@@ -245,14 +252,9 @@ void Greedy::initiate(void){
         node[i]->outLinks[j].second /= sum;
     }
   }
-  
-  //   if(Ndanglings > 0){
-  //     cout << "Found " << Ndanglings << " dangling node(s)." << endl;
-  //   }
-  
-  // Calculate steady state matrix
-  eigenvector();
-  
+
+
+
   //  // generate temporary inlink index
   //  vector<map<int,int> > linkIndex = vector<map<int,int> >(Nnode);
   //  for(int i=0;i<Nnode;i++){
@@ -265,7 +267,6 @@ void Greedy::initiate(void){
   // Update links to represent flow
   for(int i=0;i<Nnode;i++){
     node[i]->selfLink = beta*node[i]->size*node[i]->selfLink;
-    //cout << node[i]->selfLink << endl; //*****added print statement here
     if(!node[i]->outLinks.empty()){
       int NoutLinks = node[i]->outLinks.size();
       for(int j=0;j < NoutLinks; j++){
@@ -305,8 +306,8 @@ void Greedy::initiate(void){
     node[i]->exit = node[i]->size - (alpha*node[i]->size + beta*node[i]->danglingSize)*node[i]->teleportWeight - node[i]->selfLink;
   
   calibrate();
-	//*** activate print statement here for testing
-    //cout << "Initial bit rate is " << codeLength/log(2.0) << ", starting merging " << Nnode << " nodes..." << endl;
+  
+  //  cout << "Initial bit rate is " << codeLength/log(2.0) << ", starting merging " << Nnode << " nodes..." << endl;
   
 }
 
@@ -607,32 +608,20 @@ void Greedy::determMove(vector<int> &moveTo){
 
 void Greedy::eigenvector(void){
   
-  // cout << "Calculating steady state distribution of flow..."; 
+  cout << "Calculating steady state distribution of flow..."; 
   
-  vector<double> size_tmp = vector<double>(Nnode,1.0/Nnode);
-  int Niterations = 0;
-  double danglingSize;
-  double sqdiff = 1.0;
-  double sqdiff_old;
   double sum;
-  do{
     
-    // Calculate dangling size
-    danglingSize = 0.0;
-    for(int i=0;i<Ndanglings;i++){
-      danglingSize += size_tmp[danglings[i]];
-    }
-    
-    // Flow from teleportation
-    for(int i=0;i<Nnode;i++)
-      node[i]->size = (alpha + beta*danglingSize)*node[i]->teleportWeight;
+
     
     // Flow from network steps
     for(int i=0;i<Nnode;i++){
-      node[i]->size += beta*node[i]->selfLink*size_tmp[i];
+      node[i]->size += beta*node[i]->selfLink;
       int Nlinks = node[i]->outLinks.size();
+      //cout << Nlinks << endl;
       for(int j=0; j < Nlinks; j++)
-        node[node[i]->outLinks[j].first]->size += beta*node[i]->outLinks[j].second*size_tmp[i];
+      //  node[node[i]->outLinks[j].first]->size += beta*node[i]->outLinks[j].second*size_tmp[i];
+      node[i]->size += beta*node[i]->outLinks[j].second;
     }
     
     // Normalize
@@ -640,29 +629,14 @@ void Greedy::eigenvector(void){
     for(int i=0;i<Nnode;i++){
       sum += node[i]->size; 
     }
-    sqdiff_old = sqdiff;
-    sqdiff = 0.0;
+
     for(int i=0;i<Nnode;i++){
       node[i]->size /= sum;
-      sqdiff += fabs(node[i]->size - size_tmp[i]);
-      size_tmp[i] = node[i]->size;
+      //cout << node[i]->size << endl;
     }
-    Niterations++;
-    
-    if(sqdiff == sqdiff_old){
-      //    fprintf(stderr,"\n1.0e-10 added to alpha for convergence (precision error)\n");
-      //alpha += 1.0e-10;
-      //beta = 1.0-alpha;
-    }
-    
-    //fprintf(stderr,"\rCalculating steady state distribution of flow...the error is %e after %d iterations\n",sqdiff,Niterations);
-    
-  }  while((Niterations < 500) && (sqdiff > 1.0e-15 || Niterations < 50));
+
   
-  danglingSize = 0.0;
-  for(int i=0;i<Ndanglings;i++){
-    danglingSize += size_tmp[danglings[i]];
-  }
+
   
   //cout << "done! (the error is " << sqdiff << " after " << Niterations << " iterations)" << endl;
   

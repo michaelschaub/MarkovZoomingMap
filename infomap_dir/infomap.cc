@@ -16,186 +16,71 @@ void partition(MTRand *R, Node ***node, GreedyBase *greedy, bool silent);
 // Call: trade <seed> <Ntries>
 int main(int argc,char *argv[]){
   
-  if( argc !=4 ){
-    cout << "Call: ./infomap <seed> <network.net> <# attempts>" << endl;
+  if( argc < 4){
+    cout << "Call: ./infomap <seed> <network.net> <# attempts> [selflinks]" << endl;
     exit(-1);
   }
   
   int Ntrials = atoi(argv[3]);  // Set number of partition attempts
-  string infile = string(argv[2]);
-  string networkName(infile.begin(),infile.begin() + infile.find(".net"));
   string line;
   string buf;
   
   MTRand *R = new MTRand(stou(argv[1]));
-  ostringstream oss;
-  ofstream outfile;
-  
-  /* Read network in Pajek format with nodes ordered 1, 2, 3, ..., N,            */
-  /* each directed link occurring only once, and link weights > 0.               */
-  /* For more information, see http://vlado.fmf.uni-lj.si/pub/networks/pajek/.   */
-  /* Node weights are optional and sets the relative proportion to which         */
-  /* each node receives teleporting random walkers. Default value is 1.          */
-  /* Example network with three nodes and four directed and weighted links:      */
-  /* *Vertices 3                                                                 */
-  /* 1 "Name of first node" 1.0                                                  */
-  /* 2 "Name of second node" 2.0                                                 */
-  /* 3 "Name of third node" 1.0                                                  */
-  /* *Arcs 4                                                                     */
-  /* 1 2 1.0                                                                     */
-  /* 1 3 1.7                                                                     */
-  /* 2 3 2.0                                                                     */
-  /* 3 2 1.2                                                                     */
-  
-  cout << "Reading network " << argv[2] << "..." << flush;
-  ifstream net(argv[2]);
-  int Nnode = 0;
-  istringstream ss;
-  while(Nnode == 0){ 
-    if(getline(net,line) == NULL){
-      cout << "the network file is not in Pajek format...exiting" << endl;
-      exit(-1);
-    }
-    else{
-      ss.clear();
-      ss.str(line);
-      ss >> buf;
-      if(buf == "*Vertices" || buf == "*vertices" || buf == "*VERTICES"){
-        ss >> buf;
-        Nnode = atoi(buf.c_str());
-      }
-      else{
-        cout << "the network file is not in Pajek format...exiting" << endl;
-        exit(-1);
-      }
-    }
-  }
-  
-  vector<string> nodeNames(Nnode);
-  vector<double> nodeWeights = vector<double>(Nnode,1.0);
-  double totNodeWeights = 0.0;
-  
 
-  // Read node names, assuming order 1, 2, 3, ...
-  for(int i=0;i<Nnode;i++){
-    getline(net,line);
-    int nameStart = line.find_first_of("\"");
-    int nameEnd = line.find_last_of("\"");
-    if(nameStart < nameEnd){
-      nodeNames[i] =  string(line.begin() + nameStart + 1,line.begin() + nameEnd);
-      line = string(line.begin() + nameEnd + 1, line.end());
-      ss.clear();
-      ss.str(line);
-    }
-    else{
-      ss.clear();
-      ss.str(line);
-      ss >> buf; 
-      ss >> nodeNames[i];
-    }
-    
-    buf = "1";
-    ss >> buf;
-    double nodeWeight = atof(buf.c_str());
-    if(nodeWeight <= 0.0)  
-      nodeWeight = 0; //******* 1.0
-    nodeWeights[i] = nodeWeight;
-    totNodeWeights += nodeWeight;     
+  string infile = string(argv[2]);
+  string networkFile = string(argv[2]);
+  string networkName(networkFile.begin(),networkFile.begin() + networkFile.find_last_of("."));
+  string networkType(infile.begin() + infile.find_last_of("."),infile.end());
+
+	bool includeSelfLinks = true;
+	if(argc == 5)
+		if(to_string(argv[4]) == "selflinks")
+			includeSelfLinks = true;
+
+  Network network(networkFile);
+  
+  if(networkType == ".net"){
+    loadPajekNet(network);    
   }
-  
-  // Read the number of links in the network
-  getline(net,line);
-  ss.clear();
-  ss.str(line);
-  ss >> buf;
-  
-  if(buf != "*Edges" && buf != "*edges" && buf != "*Arcs" && buf != "*arcs"){
-    cout << endl << "Number of nodes not matching, exiting" << endl;
-    exit(-1);
+  else{
+    loadLinkList(network); 
   }
-  
-  int Nlinks = 0;
-  int NdoubleLinks = 0;
-	map<int,map<int,double> > Links;
-    
-  // Read links in format "from to weight", for example "1 3 0.7"
-  while(getline(net,line) != NULL){
-    ss.clear();
-    ss.str(line);
-    ss >> buf;
-    int linkEnd1 = atoi(buf.c_str());
-    ss >> buf;
-    int linkEnd2 = atoi(buf.c_str());
-    buf.clear();
-    ss >> buf;
-    double linkWeight;
-    if(buf.empty()) // If no information 
-      linkWeight = 1.0;
-    else
-      linkWeight = atof(buf.c_str());
-    linkEnd1--; // Nodes start at 1, but C++ arrays at 0.
-    linkEnd2--;
-    
-    // Aggregate link weights if they are definied more than once
-    map<int,map<int,double> >::iterator fromLink_it = Links.find(linkEnd1);
-    if(fromLink_it == Links.end()){ // new link
-      map<int,double> toLink;
-      toLink.insert(make_pair(linkEnd2,linkWeight));
-      Links.insert(make_pair(linkEnd1,toLink));
-      Nlinks++;
-    }
-    else{
-      map<int,double>::iterator toLink_it = fromLink_it->second.find(linkEnd2);
-      if(toLink_it == fromLink_it->second.end()){ // new link
-        fromLink_it->second.insert(make_pair(linkEnd2,linkWeight));
-        Nlinks++;
-      }
-      else{
-        toLink_it->second += linkWeight;
-        NdoubleLinks++;
-      }
-    }
-  }
-  net.close();
-  
-  cout << "done! (found " << Nnode << " nodes and " << Nlinks << " links";
-  if(NdoubleLinks > 0)
-    cout << ", aggregated " << NdoubleLinks << " link(s) defined more than once";
+
+  int Nnode = network.Nnode;
   
   /////////// Partition network /////////////////////
   Node **node = new Node*[Nnode];
   for(int i=0;i<Nnode;i++){
-    node[i] = new Node(i,nodeWeights[i]/totNodeWeights);
+ //   node[i] = new Node(i,network.nodeWeights[i]/network.totNodeWeights);
+      node[i] = new Node(i,0);
   }
   
   int NselfLinks = 0;
-  for(map<int,map<int,double> >::iterator fromLink_it = Links.begin(); fromLink_it != Links.end(); fromLink_it++){
-    for(map<int,double>::iterator toLink_it = fromLink_it->second.begin(); toLink_it != fromLink_it->second.end(); toLink_it++){
-      
-      int from = fromLink_it->first;
-      int to = toLink_it->first;
-      double weight = toLink_it->second;
-      if(weight > 0.0){
-        if(from == to){
-          NselfLinks++;
-          weight =weight; //********* just weight seems to be correct
-          node[from]->selfLink = weight;
-        }
-        else{
-          node[from]->outLinks.push_back(make_pair(to,weight));
-          node[to]->inLinks.push_back(make_pair(from,weight));
-        }
+  for(map<pair<int,int>,double>::iterator it = network.Links.begin(); it != network.Links.end(); it++){
+    
+    int from = it->first.first;
+    int to = it->first.second;
+    double weight = it->second;
+    if(weight > 0.0){
+      if(from == to){
+        NselfLinks++;
+				if(includeSelfLinks)
+					node[from]->selfLink += weight;
+      }
+      else{
+        node[from]->outLinks.push_back(make_pair(to,weight));
+        node[to]->inLinks.push_back(make_pair(from,weight));
       }
     }
-  }  
+  }
   
-  // SELF LOOPS ACTIVATED MANUALLY SEE LINE WITH ASTERISK see also greedy.cc >> switched of teleportation
-    
-  //cout << ", ignoring " <<  NselfLinks << " self link(s)." << endl; //**** 
-  cout << ", including " <<  NselfLinks << " self link(s))." << endl; //****
-  
+	if(includeSelfLinks)
+  	cout << ", including " <<  NselfLinks << " self link(s)." << endl;	
+	else
+		cout << ", ignoring " <<  NselfLinks << " self link(s)." << endl;
+
   //Swap vector to free memory
-  map<int,map<int,double> >().swap(Links);
+  map<pair<int,int>,double>().swap(network.Links);
     
   // Initiation
   GreedyBase* greedy;
@@ -205,12 +90,6 @@ int main(int argc,char *argv[]){
   vector<double> size(Nnode);
   for(int i=0;i<Nnode;i++)
     size[i] = node[i]->size;
-  
-// vector<int> forceclu(Nnode,0);
-// for(int i=3;i<Nnode;i++)
-// 	forceclu[i] = 1;
-// greedy->determMove(forceclu);
-// greedy->level(&node,true);
 
   cout << "Now partition the network:" << endl;
   repeated_partition(R,&node,greedy,false,Ntrials);
@@ -238,12 +117,13 @@ int main(int argc,char *argv[]){
     it_tM = treeMap.insert(make_pair(node[i]->size,tmp_tN));
     it_tM->second.exit = exit[i];
     for(int j=0;j<Nmembers;j++){
-      it_tM->second.members.insert(make_pair(size[node[i]->members[j]],make_pair(node[i]->members[j],nodeNames[node[i]->members[j]])));
+      it_tM->second.members.insert(make_pair(size[node[i]->members[j]],make_pair(node[i]->members[j],network.nodeNames[node[i]->members[j]])));
     }
   }
   
   //Print partition in format "module:rank size name"
-  oss.str("");
+  ofstream outfile;
+  ostringstream oss;
   oss << networkName << ".tree";
   outfile.open(oss.str().c_str());
   outfile << "# Code length " << greedy->codeLength/log(2.0) << " in " << Nmod << " modules." << endl; 
@@ -277,55 +157,55 @@ int main(int argc,char *argv[]){
   outfile.close();
   
   // Print map in Pajek's .net format (links sorted in descending order)
-//  oss.str("");
-//  oss << networkName << "_map.net";
-//  outfile.open(oss.str().c_str());
-//  outfile << "*Vertices " << Nmod << "\x0D\x0A";
-//  for(int i=0;i<Nmod;i++)
-//    outfile << i+1 << " \"" << i+1 << "\"" << "\x0D\x0A";
-//  outfile << "*Arcs " << sortedLinks.size() << "\x0D\x0A";
-//  for(multimap<double,pair<int,int>,greater<double> >::iterator it = sortedLinks.begin();it != sortedLinks.end();it++)
-//    outfile << "  " << it->second.first << " " << it->second.second << " " << it->first << "\x0D\x0A";
-//  outfile.close();
+  oss.str("");
+  oss << networkName << "_map.net";
+  outfile.open(oss.str().c_str());
+  outfile << "*Vertices " << Nmod << "\x0D\x0A";
+  for(int i=0;i<Nmod;i++)
+    outfile << i+1 << " \"" << i+1 << "\"" << "\x0D\x0A";
+  outfile << "*Arcs " << sortedLinks.size() << "\x0D\x0A";
+  for(multimap<double,pair<int,int>,greater<double> >::iterator it = sortedLinks.begin();it != sortedLinks.end();it++)   
+    outfile << "  " << it->second.first << " " << it->second.second << " " << it->first << "\x0D\x0A";
+  outfile.close();
   
   // Print size of modules in Pajek's .vec format
-//  oss.str("");
-//  oss << networkName << "_map.vec";
-//  outfile.open(oss.str().c_str());
-//  outfile << "*Vertices " << Nmod << "\x0D\x0A";
-//  for(int i=0;i<Nmod;i++)
-//    outfile << node[i]->size << "\x0D\x0A";
-//  outfile.close();
+  oss.str("");
+  oss << networkName << "_map.vec";
+  outfile.open(oss.str().c_str());
+  outfile << "*Vertices " << Nmod << "\x0D\x0A";
+  for(int i=0;i<Nmod;i++)
+    outfile << node[i]->size << "\x0D\x0A";
+  outfile.close();
   
   // Print map in .map format for the Map Generator at www.mapequation.org
-//  oss.str("");
-//  oss << networkName << ".map";
-//  outfile.open(oss.str().c_str());
-//  outfile << "# modules: " << Nmod << endl;
-//  outfile << "# modulelinks: " << sortedLinks.size() << endl;
-//  outfile << "# nodes: " << Nnode << endl;
-//  outfile << "# links: " << Nlinks << endl;
-//  outfile << "# codelength: " << greedy->codeLength/log(2.0) << endl;
-//  outfile << "*Directed" << endl;
-//  outfile << "*Modules " << Nmod << endl;
-//  k = 0;
-//  for(multimap<double,treeNode,greater<double> >::iterator it = treeMap.begin(); it != treeMap.end(); it++){
-//    outfile << k+1 << " \"" << it->second.members.begin()->second.second << "\" " << it->first << " " << it->second.exit << endl;
-//    k++;
-//  }
-//  outfile << "*Nodes " << Nnode << endl;
-//  k = 1;
-//  for(multimap<double,treeNode,greater<double> >::iterator it = treeMap.begin(); it != treeMap.end(); it++){
-//    string s;
-//    s.append(to_string(k));
-//    s.append(":");
-//    printTree(s,it,&outfile,true);
-//    k++;
-//  }
-//  outfile << "*Links " << sortedLinks.size() << endl;
-//  for(multimap<double,pair<int,int>,greater<double> >::iterator it = sortedLinks.begin();it != sortedLinks.end();it++)
-//    outfile << it->second.first << " " << it->second.second << " " << 1.0*it->first << endl;
-//  outfile.close();
+  oss.str("");
+  oss << networkName << ".map";
+  outfile.open(oss.str().c_str());
+  outfile << "# modules: " << Nmod << endl;
+  outfile << "# modulelinks: " << sortedLinks.size() << endl;
+  outfile << "# nodes: " << Nnode << endl;
+  outfile << "# links: " << network.Nlinks << endl;
+  outfile << "# codelength: " << greedy->codeLength/log(2.0) << endl;
+  outfile << "*Directed" << endl;
+  outfile << "*Modules " << Nmod << endl;
+  k = 0;
+  for(multimap<double,treeNode,greater<double> >::iterator it = treeMap.begin(); it != treeMap.end(); it++){
+    outfile << k+1 << " \"" << it->second.members.begin()->second.second << "\" " << it->first << " " << it->second.exit << endl;
+    k++;
+  }
+  outfile << "*Nodes " << Nnode << endl;
+  k = 1;
+  for(multimap<double,treeNode,greater<double> >::iterator it = treeMap.begin(); it != treeMap.end(); it++){
+    string s;
+    s.append(to_string(k));
+    s.append(":");
+    printTree(s,it,&outfile,true);
+    k++;
+  }
+  outfile << "*Links " << sortedLinks.size() << endl;
+  for(multimap<double,pair<int,int>,greater<double> >::iterator it = sortedLinks.begin();it != sortedLinks.end();it++)   
+    outfile << it->second.first << " " << it->second.second << " " << 1.0*it->first << endl;
+  outfile.close();
   
   //   // print size of vertices (imported as a vector in Pajek)
   //   strcpy(netname,"");
@@ -393,7 +273,7 @@ void partition(MTRand *R, Node ***node, GreedyBase *greedy, bool silent){
             int orig_NinLinks = cpy_node[orig_nr]->inLinks.size();
             sub_renumber[orig_nr] = j;
             sub_rev_renumber[j] = orig_nr;
-            sub_node[j] = new Node(j,cpy_node[orig_nr]->teleportWeight);
+            sub_node[j] = new Node(j,cpy_node[orig_nr]->teleportWeight/(*node)[i]->teleportWeight);
             sub_node[j]->selfLink =  cpy_node[orig_nr]->selfLink; // Take care of self-link
             for(int k=0;k<orig_NoutLinks;k++){
               int orig_link = cpy_node[orig_nr]->outLinks[k].first;
@@ -518,7 +398,7 @@ void partition(MTRand *R, Node ***node, GreedyBase *greedy, bool silent){
         greedy->move(moved);
         Nloops++;
         count++;
-        if(greedy->codeLength - inner_oldCodeLength < 1.0e-10)
+        if(fabs(greedy->codeLength - inner_oldCodeLength) < 1.0e-10)
           moved = false;
         
         if(count == 10){	  
