@@ -1,7 +1,7 @@
 % (c) 2012-2013 M Schaub -- michael.schaub09@imperial.ac.uk
 function MarkovZoomingMap(A,filename,time,mode,nr_runs)
 %MARKOVZOOMINGMAP implements a version of the Markov Zooming Map equation method
-% as discussed in the article:
+% for undirected, weighted networks as discussed in the article:
 %
 % "Encoding dynamics for multiscale community detection: Markov time sweeping
 %  for the Map equation", M.T.Schaub, R. Lambiotte, M. Barahona,

@@ -27,7 +27,8 @@ method as discussed in the article:
 the Map equation", M.T.Schaub, R. Lambiotte, M. Barahona, Phys. Rev. E, 2012, 
 86(2), 026112; see also arXiv:1109.6642
 
-The code is based on the implementation of the original map equation method
+The code implements the Markov Zooming Map equation for undirected, weighted networks 
+and is based on the implementation of the original map equation method
 which can be found under http://www.tp.umu.se/~rosvall/code.html
 See also http://www.mapequation.org for a dynamic visualisation of the map 
 equation. The original Map equation method is described in the following 
