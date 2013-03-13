@@ -54,6 +54,9 @@ EXAMPLE:
      % in the MarkovZoomingMap folder, load the provided example graph 
      % (a ring of rings) into an adjacency matrix
      A = convertPajekToAdjMatrix('ring_of_rings.net');
+     % COMMENT: If want to read in an unweighted pajek graph 
+     % (edges encoded: [from] [to] -- with no third colum)
+     % use the function "convertUnweightedPajekToAdjMatrix".
      
      % assign an output filename
      filename = 'test';
