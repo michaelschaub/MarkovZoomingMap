@@ -43,7 +43,8 @@ GNU General Public License for more details.</p>
 <p>You should have received a copy of the GNU General Public License
 along with this program. If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
 
-<hr><h2>Community Detection using Markov Zooming Infomap</h2>
+<hr><h2>
+<a name="community-detection-using-markov-zooming-infomap" class="anchor" href="#community-detection-using-markov-zooming-infomap"><span class="octicon octicon-link"></span></a>Community Detection using Markov Zooming Infomap</h2>
 
 <p>This code implements a MATLAB/C++ version of the Markov Zooming Map equation 
 method as discussed in the article:</p>
@@ -65,7 +66,8 @@ see also arXiv:0707.0609</p>
 
 <p>Please cite the above mentioned articles if you make use of this code.</p>
 
-<hr><h2>INSTALLATION &amp; USE</h2>
+<hr><h2>
+<a name="installation--use" class="anchor" href="#installation--use"><span class="octicon octicon-link"></span></a>INSTALLATION &amp; USE</h2>
 
 <ol>
 <li>Download the files and unzip the folders it neccessary</li>
@@ -100,7 +102,8 @@ file of the original graph.</p>
 <p>To plot the results of the analysis you may want to load the .mat file and use 
 the provided matlab script "script_plot_Map_results.m".</p>
 
-<hr><h2>Some potential code changes / improvements</h2>
+<hr><h2>
+<a name="some-potential-code-changes--improvements" class="anchor" href="#some-potential-code-changes--improvements"><span class="octicon octicon-link"></span></a>Some potential code changes / improvements</h2>
 
 <p>This released code has not been thoroughly optimized for speed, however there
 are two obvious ways to speed up the performance.</p>
@@ -112,16 +115,17 @@ implementation via e.g. a mex file from Matlab (However if you are interested
 in the "intermediate" graphs you may not want to do this, and instead change 
 the script as to not delete the temporary files but keep them).</p>
 
-<p>2) The stationary distribution of the graph is in this code computed by a
-"matrix power method". Since the actual code as it stands deals with undirected
-graphs, this is however not necessary. Instead one can easily compute the 
-stationary distribution analytically. However to make the code more easily 
-adaptable to the directed case, this computationally more expensive variant has 
-been left in  the C code.</p>
-
 <p>Further you may want to stop all the output from being displayed while the 
 optimization is running, this is also easily achievable by changing the C code
 accordingly.</p>
+
+<hr><h2>
+<a name="code-history" class="anchor" href="#code-history"><span class="octicon octicon-link"></span></a>Code history</h2>
+
+<p>Aug. 2012 -- intial release of code
+Nov. 2013 -- updated code to compute stationary distribution quicker,
+             included option to use linearisation of dynamics (equivalent to 
+             original map equation for t=1)</p>
 
 <hr><p>Author   : M. Schaub<br>
 Email    : <a href="mailto:michael.schaub09@imperial.ac.uk">michael.schaub09@imperial.ac.uk</a> </p>
