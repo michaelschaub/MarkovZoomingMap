@@ -85,16 +85,17 @@ implementation via e.g. a mex file from Matlab (However if you are interested
 in the "intermediate" graphs you may not want to do this, and instead change 
 the script as to not delete the temporary files but keep them).
 
-2) The stationary distribution of the graph is in this code computed by a
-"matrix power method". Since the actual code as it stands deals with undirected
-graphs, this is however not necessary. Instead one can easily compute the 
-stationary distribution analytically. However to make the code more easily 
-adaptable to the directed case, this computationally more expensive variant has 
-been left in  the C code.
-
 Further you may want to stop all the output from being displayed while the 
 optimization is running, this is also easily achievable by changing the C code
 accordingly.
+
+-----------------------------------------------------------------------------
+Code history
+-----------------------------------------------------------------------------
+Aug. 2012 -- intial release of code
+Nov. 2013 -- updated code to compute stationary distribution quicker,
+             included option to use linearisation of dynamics (equivalent to 
+             original map equation for t=1)
 
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
