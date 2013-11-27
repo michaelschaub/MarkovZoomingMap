@@ -95,7 +95,7 @@ accordingly.
 -----------------------------------------------------------------------------
 Code history
 -----------------------------------------------------------------------------
-Aug. 2012 -- intial release of code
+Aug. 2012 -- intial release of code  
 Nov. 2013 -- updated code to compute stationary distribution quicker,
              included option to use linearisation of dynamics (equivalent to 
              original map equation for t=1)
